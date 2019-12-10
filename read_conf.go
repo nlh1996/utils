@@ -3,19 +3,34 @@ package utils
 import (
 	"encoding/json"
 	"io/ioutil"
+	"os"
 )
 
-/*
-	读取全局配置
-*/
-
 // ReadFile .
-func ReadFile(data interface{}) {
-	filedata, err := ioutil.ReadFile("conf/conf.json")
+// 读取json配置文件
+// data 结构体指针
+// path 配置文件相对路径 例如"conf/conf.json"
+func ReadFile(data interface{}, path string) error {
+	if confFileExists, err := PathExists(path); confFileExists != true {
+		return err
+	}
+
+	filedata, err := ioutil.ReadFile(path)
 	if err != nil {
-		panic(err)
+		return err
 	}
-	if err := json.Unmarshal(filedata, data); err != nil {
-		panic(err)
+
+	return json.Unmarshal(filedata, data)
+}
+
+// PathExists 判断一个文件是否存在
+func PathExists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
 	}
+	if os.IsNotExist(err) {
+		return false, err
+	}
+	return false, err
 }
