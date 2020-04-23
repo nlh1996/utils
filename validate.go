@@ -36,7 +36,7 @@ func (v *ValidateCode) RandCode(len int) []string {
 		arr []string
 		index int
 	)
-	for k, _ := range v.code {
+	for k := range v.code {
 		arr = append(arr, k)
 		index ++
 		if index != len {		
