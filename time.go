@@ -46,3 +46,9 @@ func ComputeAge(str string) int {
 	}
 	return age
 }
+
+// ComputeSecond 计算时间戳与当前时间戳间隔秒数
+func ComputeSecond(d int64) int64 {
+	now := time.Now().Unix()  
+	return now-d
+}

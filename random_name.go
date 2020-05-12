@@ -60,8 +60,8 @@ func getLastName() string {
 	return lastNames[rand.Intn(len(lastNames)-1)]
 }
 
-// RandomUserName 随机姓名 length姓名长度 2,3可选
-func RandomUserName(length int) string {
+// RandomName 随机姓名 length姓名长度 2,3可选
+func RandomName(length int) string {
 	name := getSurname() + getLastName()
 	if length == 3 {
 		name += getLastName()
