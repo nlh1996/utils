@@ -49,6 +49,20 @@ func ComputeAge(str string) int {
 
 // ComputeSecond 计算时间戳与当前时间戳间隔秒数
 func ComputeSecond(d int64) int64 {
-	now := time.Now().Unix()  
-	return now-d
+	now := time.Now().Unix()
+	return now - d
+}
+
+// Timer 定时器 callback回调函数 d触发间隔 count循环次数 -1无限循环
+func Timer(callback func(),d time.Duration, count int) {
+	if count == -1 {
+		for range time.Tick(d) {
+			callback()
+		}
+	} else {
+		for i := 0; i < count; i++ {
+			time.Sleep(d)
+			callback()
+		}
+	}
 }
