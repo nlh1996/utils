@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"context"
 	"strconv"
 	"time"
 )
@@ -54,10 +55,15 @@ func ComputeSecond(d int64) int64 {
 }
 
 // Timer 定时器 callback回调函数 d触发间隔 count循环次数 -1无限循环
-func Timer(callback func(),d time.Duration, count int) {
+func Timer(callback func(), d time.Duration, count int, ctx context.Context) {
 	if count == -1 {
 		for range time.Tick(d) {
-			callback()
+			select {
+			case <-ctx.Done():
+				return
+			default:
+				callback()
+			}
 		}
 	} else {
 		for i := 0; i < count; i++ {
