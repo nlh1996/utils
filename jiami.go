@@ -7,12 +7,13 @@ import (
 	"crypto/rsa"
 	"crypto/sha256"
 	"crypto/x509"
+	"encoding/base64"
 	"encoding/pem"
 	"errors"
 	"fmt"
 )
 
-// Jiami 加密
+// Jiami md5加密
 func Jiami(arg1 string, arg2 string) string {
 	h := md5.New()
 	h.Write([]byte(arg1))
@@ -117,12 +118,12 @@ func RsaEncrypt(data, keyBytes []byte) []byte {
 
 // RsaDecrypt 私钥解密
 func RsaDecrypt(ciphertext, keyBytes []byte) []byte {
-	//获取私钥
+	// 获取私钥
 	block, _ := pem.Decode(keyBytes)
 	if block == nil {
 		panic(errors.New("private key error!"))
 	}
-	//解析PKCS1格式的私钥
+	// 解析PKCS1格式的私钥
 	priv, err := x509.ParsePKCS1PrivateKey(block.Bytes)
 	if err != nil {
 		panic(err)
@@ -133,4 +134,42 @@ func RsaDecrypt(ciphertext, keyBytes []byte) []byte {
 		panic(err)
 	}
 	return data
+}
+
+// VerifyRsaSign .
+func VerifyRsaSign(content string, sign string, publicKey string) error {
+	publicKeyByte, err := base64.StdEncoding.DecodeString(publicKey)
+	if err != nil {
+		return err
+	}
+	pub, err := x509.ParsePKIXPublicKey(publicKeyByte)
+	if err != nil {
+		return err
+	}
+	hashed := sha256.Sum256([]byte(content))
+	signature, err := base64.StdEncoding.DecodeString(sign)
+	if err != nil {
+		return err
+	}
+	return rsa.VerifyPKCS1v15(pub.(*rsa.PublicKey), crypto.SHA256, hashed[:], signature)
+}
+
+// VerifyRsa1Sign .
+func VerifyRsa1Sign(content string, sign string, publicKey string) error {
+	publicKeyByte, err := base64.StdEncoding.DecodeString(publicKey)
+	if err != nil {
+		return err
+	}
+	pub, err := x509.ParsePKIXPublicKey(publicKeyByte)
+	if err != nil {
+		return err
+	}
+	h := crypto.Hash.New(crypto.SHA1) //进行SHA1的散列
+	h.Write([]byte(content))
+	hashed := h.Sum(nil)
+	signature, err := base64.StdEncoding.DecodeString(sign)
+	if err != nil {
+		return err
+	}
+	return rsa.VerifyPKCS1v15(pub.(*rsa.PublicKey), crypto.SHA1, hashed[:], signature)
 }
