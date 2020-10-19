@@ -173,3 +173,63 @@ func VerifyRsa1Sign(content string, sign string, publicKey string) error {
 	}
 	return rsa.VerifyPKCS1v15(pub.(*rsa.PublicKey), crypto.SHA1, hashed[:], signature)
 }
+
+func verifySign(signData, sign, signType, aliPayPublicKey string) (err error) {
+	var (
+		h         hash.Hash
+		hashs     crypto.Hash
+		block     *pem.Block
+		pubKey    interface{}
+		publicKey *rsa.PublicKey
+		ok        bool
+	)
+	signBytes, _ := base64.StdEncoding.DecodeString(sign)
+	if block, _ = pem.Decode([]byte(aliPayPublicKey)); block == nil {
+		return errors.New("支付宝公钥Decode错误")
+	}
+	if pubKey, err = x509.ParsePKIXPublicKey(block.Bytes); err != nil {
+		return fmt.Errorf("x509.ParsePKIXPublicKey：%w", err)
+	}
+	if publicKey, ok = pubKey.(*rsa.PublicKey); !ok {
+		return errors.New("支付宝公钥转换错误")
+	}
+	switch signType {
+	case "RSA":
+		hashs = crypto.SHA1
+	case "RSA2":
+		hashs = crypto.SHA256
+	default:
+		hashs = crypto.SHA256
+	}
+	h = hashs.New()
+	h.Write([]byte(signData))
+	return rsa.VerifyPKCS1v15(publicKey, hashs, h.Sum(nil), signBytes)
+}
+
+// FormatPublicKey .
+func FormatPublicKey(publicKey string) (pKey string) {
+	var buffer strings.Builder
+	buffer.WriteString("-----BEGIN PUBLIC KEY-----\n")
+	rawLen := 64
+	keyLen := len(publicKey)
+	raws := keyLen / rawLen
+	temp := keyLen % rawLen
+	if temp > 0 {
+		raws++
+	}
+	start := 0
+	end := start + rawLen
+	for i := 0; i < raws; i++ {
+		if i == raws-1 {
+			buffer.WriteString(publicKey[start:])
+		} else {
+			buffer.WriteString(publicKey[start:end])
+		}
+		buffer.WriteByte('\n')
+		start += rawLen
+		end = start + rawLen
+	}
+	buffer.WriteString("-----END PUBLIC KEY-----\n")
+	pKey = buffer.String()
+	return
+}
