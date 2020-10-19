@@ -11,6 +11,8 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"hash"
+	"strings"
 )
 
 // Jiami md5加密
