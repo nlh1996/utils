@@ -40,6 +40,8 @@ cc.Class({
     //获取微信界面大小
     let width = sysInfo.screenWidth;
     let height = sysInfo.screenHeight;
+    cc.sys.localStorage.setItem('width', width)
+    cc.sys.localStorage.setItem('height', height)
     let self = this
 
     wx.getSetting({
@@ -85,7 +87,6 @@ cc.Class({
   },
 
   login() {
-    let self = this;
     console.log("login: ");
     wx.login({ 
       success (res) {
