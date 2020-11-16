@@ -12,6 +12,8 @@ import (
 	"errors"
 	"fmt"
 	"hash"
+	"log"
+	"net/url"
 	"strings"
 )
 
@@ -25,6 +27,33 @@ func Jiami(arg1 string, arg2 string) string {
 	h.Write([]byte(result + "你妈嗨"))
 	result = fmt.Sprintf("%x", h.Sum(nil))
 	return result
+}
+
+// MD5 .
+func MD5(arg string) string {
+	h := md5.New()
+	h.Write([]byte(arg))
+	return fmt.Sprintf("%x", h.Sum(nil))
+}
+
+// URLDecode .
+func URLDecode(d string) string {
+	res, err := url.QueryUnescape(d)
+	if err != nil {
+		log.Println(err)
+		return ""
+	}
+	return res
+}
+
+// Base64Decode .
+func Base64Decode(d string) string {
+	res, err := base64.StdEncoding.DecodeString(d)
+	if err != nil {
+		log.Println(err)
+		return ""
+	}
+	return string(res)
 }
 
 // GenRsaKey RSA公钥私钥产生
