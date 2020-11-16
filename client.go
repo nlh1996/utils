@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"errors"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -65,4 +66,16 @@ func HttpGet(url string) []byte {
 		resp.Body.Close()
 	}
 	return body
+}
+
+// ReadBody .
+func ReadBody(d io.ReadCloser) map[string]string {
+	body, err := ioutil.ReadAll(d)
+	if err != nil {
+		log.Println(err)
+		return nil
+	}
+	m := map[string]string{}
+	json.Unmarshal(body, &m)
+	return m
 }
