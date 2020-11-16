@@ -25,7 +25,7 @@ class CusHttp {
     if (this._http.readyState == 4) {
       if (this._http.status == 200) {
         if (this._callback) {
-          this._callback(this._http.response)
+          this._callback(JSON.parse(this._http.response))
         }
       }else{
         console.log(this._http.response)
